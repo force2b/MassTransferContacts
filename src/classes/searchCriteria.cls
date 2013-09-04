@@ -1,7 +1,7 @@
-/* -------------------------------------------------------------------------------------
-* searchCriteria Class
-* M.Smith 1 April 2009
-* http://www.force2b.net
+/* ******************************************************************************************
+* Class: searchCriteria
+* Created: M.Smith, 04/01/2009
+* http://www.force2b.net 
 *
 * Mass Transfer Search Criteria Wrapper Class
 * - Used by the TransferContacts Class and Page 
@@ -12,7 +12,7 @@
 *
 * Modifications:
 * - M.Smith, 05/25/2011: Don't include TEXTAREA and Encrypted fields as a criteria field
-*  ------------------------------------------------------------------------------------- */
+****************************************************************************************** */
 public with sharing class searchCriteria{
 
     public string SearchField = '';

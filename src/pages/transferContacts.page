@@ -1,17 +1,17 @@
-<apex:page controller="transferContacts" title="Mass Transfer Contacts" id="MassTransferContactsPage" >
-<!-- -------------------------------------------------------------------------------------
-* Mass TransferContacts Page
-* M.Smith 8 April 2009, 01/25/2010, 03/29/2010, 05/11/2011, 10/15/2011
-* http://www.force2b.net
+<!-- ******************************************************************************************
+* VF Page: TransferContacts
+* Created: M.Smith, 04/08/2009, 01/25/2010, 03/29/2010, 05/11/2011, 10/15/2011
+* http://www.force2b.net 
 *
 * Note: The columns displayed in the search results can be modified directly in this
-* VisualForce page, even in Production. See the note in the seach results section
-* further down in the page for more information.
+* VisualForce page, even in Production. See the note in the search results section
+* further down in the page for more information. 
+* [Field Sets should be considered for a future update]
 *
 * Run the page with transferContacts?debug=1 to display the query and other details
 *
 * Modifications:
-* - M.Smith, 01/25/2010: Using the lookup fields for FROM/TO userids
+* - M.Smith, 01/25/2010: Using the lookup fields for FROM/TO userIds
 * - M.Smith, 03/29/2010: The FROM USER Lookup field does not support In-Active Users
 *       - Resolve this by adding a link for "Show Inactive Users" to the page
 *       - If clicked, it hides the "Active User Lookup" and replaces it with a picklist of
@@ -23,8 +23,8 @@
 * - M.Smith, 10/15/2011
 *       - In the Contact Search Results stop using URLFOR() because some PE users are getting errors
 *       - Update the 'From' user logic to work with Inactive AND Portal user types as well as Active users 
-*  -------------------------------------------------------------------------------------
--->
+****************************************************************************************** -->
+<apex:page controller="transferContacts" title="Mass Transfer Contacts" id="MassTransferContactsPage" >
 <apex:includeScript value="{!URLFOR($Resource.jQuery144, '/js/jquery-1.4.4.min.js')}" />
 
 <apex:sectionHeader title="Mass Contact Transfer Utility" />

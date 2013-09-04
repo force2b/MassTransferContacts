@@ -1,7 +1,7 @@
-/* -------------------------------------------------------------------------------------
-* TransferContact Class: Controller for the TransferContacts page
-* M.Smith 8 April 2009, 01/25/2010, 03/29/2010, 05/11/2011, 10/15/2011
-* http://www.force2b.net
+/* ******************************************************************************************
+* Class: TransferContacts -- Controller for the TransferContacts page
+* Created: M.Smith, 04/08/2009, 01/25/2010, 03/29/2010, 05/11/2011, 10/15/2011
+* http://www.force2b.net 
 *
 * Mass Contact Transfer Controller Class
 * - Used by the TransferContacts Page
@@ -31,7 +31,7 @@
 * - M.Smith, 10/15/2011
 *       - In the Contact Search Results stop using URLFOR() because some PE users are getting errors
 *       - Update the 'From' user logic to work with Inactive AND Portal user types as well as Active users 
-*  ------------------------------------------------------------------------------------- */
+******************************************************************************************* */
 public With Sharing class transferContacts {
 
     // From and To UserID's - PICKLIST VERSIONS

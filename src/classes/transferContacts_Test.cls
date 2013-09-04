@@ -1,8 +1,10 @@
 @isTest
-/* -------------------------------------------------------------------------------------
-* TransferContacts_Test Class: Test the Classes used by the Mass Contact Transfer page
-* M.Smith 8 April 2009
-* http://www.force2b.net
+/* ******************************************************************************************
+* Test Class: TransferContacts_Test
+* Created: M.Smith, 04/08/2009
+* http://www.force2b.net 
+*
+* - Test the Classes used by the Mass Contact Transfer page
 *
 * Modifications:
 * - M.Smith, 01/25/2010: Using the new lookup fields for FROm/TO userids
@@ -10,7 +12,7 @@
 * - E.Peterson, 06/18/2010: Reduced unit test dataset from 10 contacts to 5 
 * - M.Smith, 05/11/2011: Changes to support modifications to main class & page. Bring up coverage %
 *
-* ------------------------------------------------------------------------------------- */
+****************************************************************************************** */
 private class transferContacts_Test {
 
     static testMethod void myUnitTest() {
