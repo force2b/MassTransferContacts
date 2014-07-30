@@ -12,6 +12,7 @@
 *
 * Modifications:
 * - M.Smith, 05/25/2011: Don't include TEXTAREA and Encrypted fields as a criteria field
+* - M.Smith, 07/30/2014: Allow Phone fields to be searched using STARTS WITH and CONTAINS 
 ****************************************************************************************** */
 public with sharing class searchCriteria{
 
@@ -161,9 +162,9 @@ public with sharing class searchCriteria{
             this.errMsg = 'Value can only be TRUE or FALSE';
         }  
         if ((fldType == 'DATE' || fldType == 'DATETIME' || fldType == 'CURRENCY' 
-        || fldType == 'DOUBLE' || fldType == 'PHONE' || fldType == 'BOOLEAN'
-        || fldType == 'INTEGER' || fldType == 'PERCENT') 
-        && (this.SearchOperator == 'starts' || this.SearchOperator == 'contains' || this.SearchOperator == 'notcontain' || this.SearchOperator == 'in' || this.SearchOperator == 'notin')) {
+		        || fldType == 'DOUBLE' || fldType == 'BOOLEAN' || fldType == 'INTEGER' || fldType == 'PERCENT') 
+		        && (this.SearchOperator == 'starts' || this.SearchOperator == 'contains' 
+		        || this.SearchOperator == 'notcontain' || this.SearchOperator == 'in' || this.SearchOperator == 'notin')) {
             this.errMsg = 'Invalid Operator for this Field Type';
         }  
 
@@ -192,7 +193,8 @@ public with sharing class searchCriteria{
         if (this.SearchOperator == 'ge') cOperator = '>=';
         if (this.SearchOperator == 'le') cOperator = '<=';
         
-        if (fldType == 'STRING' || fldType == 'EMAIL' || fldType == 'PICKLIST' || fldType == 'MULTIPICKLIST' || fldType == 'TEXTAEA') {
+        if (fldType == 'STRING' || fldType == 'EMAIL' || fldType == 'PICKLIST' 
+        		|| fldType == 'MULTIPICKLIST' || fldType == 'TEXTAEA' || fldType == 'PHONE') {
             if (this.SearchOperator == 'starts') { cOperator = ' LIKE \''; cCloseCharacter = '%\''; }
             if (this.SearchOperator == 'contains') { cOperator = ' LIKE \'%'; cCloseCharacter = '%\''; }
             if (this.SearchOperator == 'notcontain') {
@@ -214,7 +216,8 @@ public with sharing class searchCriteria{
             this.errMsg = 'Invalid Operator for this field';
         }
                 
-        if (fldType == 'STRING' || fldType == 'EMAIL' || fldType == 'PICKLIST' || fldType == 'MULTIPICKLIST' || fldType == 'TEXTAEA') {
+        if (fldType == 'STRING' || fldType == 'EMAIL' || fldType == 'PICKLIST' || fldType == 'MULTIPICKLIST' 
+        		|| fldType == 'TEXTAEA' || fldType == 'PHONE') {
         
             if (cCloseCharacter.startsWith('%')) {
                 // Using LIKE ('Starts With' or 'Contains')
