@@ -23,22 +23,28 @@
 * - M.Smith, 10/15/2011
 *       - In the Contact Search Results stop using URLFOR() because some PE users are getting errors
 *       - Update the 'From' user logic to work with Inactive AND Portal user types as well as Active users 
+* - M.Smith, 07/30/2014
+*		- Fix issues with the page message section not re-rendering properly
+*		- Change column widths to give criteria error messages more room to display
 ****************************************************************************************** -->
 <apex:page controller="transferContacts" title="Mass Transfer Contacts" id="MassTransferContactsPage" >
 <apex:includeScript value="{!URLFOR($Resource.jQuery144, '/js/jquery-1.4.4.min.js')}" />
 
 <apex:sectionHeader title="Mass Contact Transfer Utility" />
 
-<apex:messages />
+<apex:form id="txfrContactsForm" >
 
-    <apex:form id="txfrContactsForm" >
-        <apex:pageBlock id="xferContactsPageBlock"
+	<apex:outputPanel id="pgMessages"> 
+		<apex:pageMessages />
+	</apex:outputPanel>
+
+    <apex:pageBlock id="xferContactsPageBlock"
         helpTitle="Entering Criteria" 
         helpUrl="/help/doc/en/reports_filter.htm">
 
         <!-- ********* THE [SEARCH] BUTTON ************ -->
         <apex:pageBlockButtons >
-            <apex:commandButton title="Find" value="Find" action="{!doSearch}"/>
+            <apex:commandButton title="Find" value="Find" action="{!doSearch}" rerender="pgMessages,Results,Criteria" />
         </apex:pageBlockButtons>
 
         <!-- ********* SELECT FROM/TO USER NAME ************ -->
@@ -94,24 +100,31 @@
 
         <!-- ********* SEARCH CRITERIA ************ -->
         <apex:pageBlockSection columns="6" title="Selection Criteria" collapsible="false" id="Criteria" >
-        <apex:dataTable value="{!searchCriteria}" columns="5" var="criteria" id="CriteriaRows">
+        <apex:outputPanel layout="none"> 
+        <div id="searchCriteriaDiv">
+        <apex:dataTable value="{!searchCriteria}" columns="5" var="criteria" id="CriteriaRows" >
             <apex:column width="25%">
                 <apex:selectList value="{!criteria.searchField}" size="1" id="SearchField" >
-                    <apex:selectOptions value="{!searchFields}"></apex:selectOptions>
+                    <apex:selectOptions value="{!searchFields}" />
                 </apex:selectList>
             </apex:column>
-
             <apex:column width="25%">
-            <apex:selectList size="1" value="{!criteria.searchOperator}" id="SearchOperator">
-                <apex:selectOptions value="{!criteria.OperatorSelectList}"></apex:selectOptions>
-            </apex:selectList>
+	            <apex:selectList size="1" value="{!criteria.searchOperator}" id="SearchOperator">
+	                <apex:selectOptions value="{!criteria.OperatorSelectList}" />
+	            </apex:selectList>
             </apex:column>
             <apex:column width="25%">
-            <apex:inputText size="20" id="SearchValue" value="{!criteria.searchValue}"/>
+            	<apex:inputText size="20" id="SearchValue" value="{!criteria.searchValue}"/>
             </apex:column>
-            <apex:column width="5%"><apex:outputText value="{!criteria.Logical}"/></apex:column>
-            <apex:column width="20%"><apex:outputText value="{!criteria.errMsg}" style="color:red;"/></apex:column>
+            <apex:column width="5%">
+            	<apex:outputText value="{!criteria.Logical}"/>
+            </apex:column>
+            <apex:column width="20%">
+            	<apex:outputText value="{!criteria.errMsg}" style="color:red;"/>
+            </apex:column>
         </apex:dataTable>
+        </div>
+        </apex:outputPanel>
         </apex:pageBlockSection>
 
         <apex:pageBlockSection columns="1" >
@@ -198,6 +211,9 @@
 // ------------------------------------------------------------
 
 j$ = jQuery.noConflict();
+j$(document).ready(function(){	
+	j$("#searchCriteriaDiv").parent("td").css("width", "90%");
+});
 
 // ************************************************************************************
 // Function: toggleUserSelectionBlocks()

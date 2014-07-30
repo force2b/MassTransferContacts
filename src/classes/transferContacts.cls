@@ -190,6 +190,8 @@ public With Sharing class transferContacts {
 	// -------------------------------------------------------------------------------------
     public pageReference doSearch() {
 
+		searchResults.clear();
+
         // Retrieve the To & From user ID's from the lookup field
         this.toUserID = proxyAcctLookupTO.OwnerId;
 
