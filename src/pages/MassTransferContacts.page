@@ -1,0 +1,341 @@
+<!-- ******************************************************************************
+* Page: MassTransferContacts
+* Created: M.Smith, 04/08/2009, 07/15/2016
+* http://www.force2b.net
+*
+* Rebuilt in 2016 using the Salesforce Lightning Design System (SLDS) version 2.0.2
+*
+* Modifications:
+*
+*********************************************************************************** -->
+<apex:page showHeader="true" sidebar="false" docType="html-5.0" standardStylesheets="false"
+	title="Mass Transfer Contacts by Force2b, LLC" tabStyle="Mass_Contact_Transfer__tab"
+	controller="MassTransferContactsController">
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+<apex:includeScript value="{!URLFOR($Resource.MassTransferContacts_Resources, 'jquery-2.2.0.min.js')}" />
+
+<script>
+/* Instantiate a unique jQuery instance */
+j$ = jQuery.noConflict();
+</script>
+<apex:includeScript value="{!URLFOR($Resource.MassTransferContacts_Resources, 'mass-transfer-contacts-page.js')}" />
+
+<apex:stylesheet value="{!URLFOR($Resource.SalesforceLightningDesignSystem_v202, 'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+
+<style>
+/* Bold the inactive [heading] options in the fields picklist */
+.mass-transfer-contacts select option:disabled {
+		color: #000;
+		font-weight: bold;
+}
+
+/* Position the inline help text pop-ups for the transfer options */
+.mass-transfer-contacts .mtc-slds-inline-help-popup {
+	display:none;
+	position:absolute;
+	top:-25px;
+	width:20rem;
+}
+
+/* Bold the column headings on the search results */
+.mass-transfer-contacts .slds-text-heading--label .slds-truncate {
+    font-weight: bold;
+}
+
+/* Part of https://vishnuvaishnav.wordpress.com/2016/02/21/convert-standard-page-messages-in-lightning-design-system/ */
+.mass-transfer-contacts .msgIcon {
+		display: none!important
+}
+.mass-transfer-contacts .customMessage * {
+		color: #fff!important
+}
+.mass-transfer-contacts .customMessage {
+		margin: 5px 0!important;
+		max-width: 1280px;
+		opacity: 1!important;
+		width: 100%;
+		font-size: 12px;
+		border: 0px;
+		padding-left: 10px;
+}
+.mass-transfer-contacts .message {
+		opacity: .1
+}
+
+</style>
+
+<!-- SLDS uses a unique CSS name-space on Visualforce Pages -->
+<div class="mass-transfer-contacts" style="margin: 5px">
+
+<!-- REQUIRED SLDS WRAPPER -->
+<div class="slds">
+
+<div class="slds-page-header" role="banner">
+	<div class="slds-media slds-media--center">
+		<div class="slds-media__figure">
+			<svg aria-hidden="true" class="slds-icon slds-icon-standard-contact">
+			<use xlink:href="{!URLFOR($Resource.SalesforceLightningDesignSystem_v202, 'assets/icons/standard-sprite/svg/symbols.svg#contact')}" />
+			</svg>
+		</div>
+		<div class="slds-media__body">
+			<p class="slds-page-header__title slds-truncate slds-align-middle"
+				title="Mass Transfer Contacts Utility">Mass Transfer Contacts Utility</p>
+		</div>
+	</div>
+</div>
+
+<!-- Page Messages -->
+<apex:pageMessages id="msgs" showDetail="true" />
+
+<!-- The 'To' User lookup -->
+<div class="slds-box">
+<div class="slds-form-element slds-lookup slds-is-open" data-select="single" data-scope="single">
+	<h3 class="slds-section__title"><abbr class="slds-required" title="required">*</abbr>Transfer Contacts To</h3>
+	<!-- <label class="slds-form-element__label" for="lookup-01">Transfer To</label> -->
+	<div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+		<svg aria-hidden="true" class="slds-input__icon slds-icon-text-default">
+		<use xlink:href="{!URLFOR($Resource.SalesforceLightningDesignSystem_v202, '/assets/icons/utility-sprite/svg/symbols.svg#search')}" />
+		</svg>
+		<input id="mtc-input-user-lookup" class="slds-lookup__search-input slds-input" type="text"
+			aria-autocomplete="list" role="combobox" aria-expanded="true"
+			aria-activedescendant="mtc-user-selection-typeahead" placeholder="Search Users"
+			data-onselectfunction="selectToUser"
+			onkeyup="force2b.userSearchTypeAhead(j$(this));" />
+	</div>
+	<div class="slds-lookup__menu" role="listbox" style="display: none;"
+			id="mtc-user-selection-typeahead">
+		<ul class="slds-lookup__list slds-text-heading--medium" role="presentation"
+				id="mtc-input-user-lookup-results" >
+			<!-- The content in here will be dynamically built by JavaScript -->
+		</ul>
+	</div>
+</div>
+</div>
+<br/>
+
+	<apex:form id="mtc-criteria-form" >	<!-- helpUrl="/help/doc/en/reports_filter.htm" -->
+		<apex:input value="{!toUserId}" styleClass="mtc-to-user-id" style="display: none;"  />
+		<h3 class="slds-section-title--divider">Search Criteria</h3>
+		<!-- Search Criteria Table -->
+		<div class="slds-form-element">
+		<table class="slds-table slds-table--bordered slds-table--cell-buffer slds-no-row-hover"
+				id="mtc-criteria-table">
+			<tbody>
+				<apex:repeat value="{!searchCriteria}" var="criteria">
+					<tr id="mtc-criteria-row-{!criteria.rowNum}">
+						<td scope="row">
+							<div class="slds-form-element__control">
+								<div class="slds-select_container">
+									<apex:selectList value="{!criteria.searchField}" size="1" id="mtc-search-field"
+												styleClass="slds-select mtc-search-field" onChange="force2b.onChangeFilterType(this)">
+										<apex:selectOption itemLabel="- Select -" itemValue="" />
+										<apex:selectOption itemLabel="Owner Selection" itemValue="_UserFields" itemDisabled="True" />
+										<apex:selectOptions value="{!UserFieldsPicklist}" />
+										<apex:selectOption itemLabel="Contact Fields" itemValue="_ContactFields" itemDisabled="True" />
+										<apex:selectOptions value="{!ContactFieldsPicklist}" />
+										<apex:selectOption itemLabel="Account Fields" itemValue="_AccountFields" itemDisabled="True" />
+										<apex:selectOptions value="{!AccountFieldsPicklist}" />
+									</apex:selectList>
+								</div>
+							</div>
+						</td>
+
+						<td scope="row">
+							<div class="slds-form-element__control">
+								<div class="slds-select_container">
+									<apex:selectList size="1" value="{!criteria.searchOperator}" id="mtc-search-operator"
+												styleClass="slds-select mtc-search-operator">
+										<apex:selectOptions value="{!criteria.OperatorSelectList}" />
+									</apex:selectList>
+								</div>
+							</div>
+						</td>
+
+						<td scope="row">
+							<div class="slds-form-element__control">
+								<!-- Plain Text Input -->
+								<div id="mtc-criteria-plain-text">
+									<apex:inputText size="30" id="mtc-search-value" value="{!criteria.searchValue}"
+										styleClass="slds-input mtc-search-value"
+										html-data-rownumber="{!criteria.rowNum}"/>
+								</div>
+								<!-- User Lookup -->
+								<div id="mtc-criteria-from-user-lookup" style="display:none">
+									<!-- <apex:input value="{!fromUserId}" styleClass="mtc-from-user-id" style="display: none;"  /> -->
+									<div class="slds-form-element slds-lookup slds-is-open" data-select="single" data-scope="single">
+										<div class="slds-form-element__control slds-input-has-icon slds-input-has-icon--right">
+											<svg aria-hidden="true" class="slds-input__icon slds-icon-text-default">
+											<use xlink:href="{!URLFOR($Resource.SalesforceLightningDesignSystem_v202, '/assets/icons/utility-sprite/svg/symbols.svg#search')}" />
+											</svg>
+											<input id="mtc-input-from-user-lookup" class="slds-lookup__search-input slds-input" type="text"
+												aria-autocomplete="list" role="combobox" aria-expanded="true"
+												aria-activedescendant="mtc-from-user-selection-typeahead" placeholder="Search Users"
+												data-onselectfunction="selectFromUser" data-rownumber="{!criteria.rowNum}"
+												onkeyup="force2b.userSearchTypeAhead(j$(this));" />
+										</div>
+										<div class="slds-lookup__menu" role="listbox" style="display: none;"
+												id="mtc-from-user-selection-typeahead">
+											<ul class="slds-lookup__list slds-text-heading--medium" role="presentation"
+													id="mtc-input-from-user-lookup-results" >
+												<!-- The content in here will be dynamically built by JavaScript -->
+											</ul>
+										</div>
+									</div>
+								</div>
+							</div>
+						</td>
+
+						<td scope="row">
+							&nbsp;&nbsp;<apex:outputText value="{!criteria.Logical}"/>
+						</td>
+					</tr>
+				</apex:repeat>
+				<tr>
+					<td colspan="4" scope="row">
+						<span class="slds-text-body--small">Note: Dates Must be Entered in {!InputDateFormat} format or use special date literals (ex: THIS WEEK)</span>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+		</div>
+
+	<br/>
+	<!-- Action Bar -->
+	<div class="slds-box  slds-box--x-small">
+		<div class="slds-grid slds-grid--pull-padded">
+
+			<!-- Find Contacts Button -->
+			<div class="slds-col--padded">
+				<apex:commandButton title="Find Contacts that match search criteria"
+					value=" Find " rerender="msgs,mtc-search-results"
+					action="{!searchForContacts}"
+					onClick="force2b.startContactSearch();"
+					onComplete="force2b.finishedWithSearch();"
+					styleClass="mtc-find-button slds-button slds-button--brand slds-button--neutral slds-not-selected"/>
+			</div>
+
+			<!-- Option: Send Email to new Owner -->
+			<div class="slds-col--padded">
+				<div class="slds-form-element">
+					<label class="slds-checkbox--toggle slds-grid slds-grid--vertical-align-center">
+						<div class="slds-form-element__icon" style="margin-top: -5px; padding-right: 4px;"
+								id="mtc-help-icon-send-email">
+							<a href="javascript:void(0);">
+								<svg aria-hidden="true" class="slds-icon slds-icon--x-small slds-icon-text-default">
+									<use xlink:href="{!URLFOR($Resource.SalesforceLightningDesignSystem_v202, '/assets/icons/utility-sprite/svg/symbols.svg#info')}"></use>
+								</svg>
+								<span class="slds-assistive-text">Help</span>
+							</a>
+						</div>
+						<span class="slds-form-element__label m-bottom--">Send Email to New Owner</span>
+						<apex:inputCheckBox value="{!optSendeMailToOwner}"
+							styleClass="mtc-transfer-option"
+							html-aria-describedby="mtc-send-email-help"  />
+						<span class="slds-checkbox--faux" data-check-on="Yes" data-check-off="No"></span>
+					</label>
+				</div>
+				<div id="mtc-send-email-help" class="mtc-slds-inline-help-popup slds-popover slds-popover--tooltip slds-nubbin--bottom-left"
+						role="tooltip" aria-live="polite" >
+					<div class="slds-popover__body slds-text-longform">
+						<p>Send an email to the new owner with a list of all the Contacts transferred to them</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Option: Transfer Notes, Events, Attachments -->
+			<div class="slds-col--padded">
+				<div class="slds-form-element">
+					<label class="slds-checkbox--toggle slds-grid slds-grid--vertical-align-center">
+						<div class="slds-form-element__icon" style="margin-top: -5px; padding-right: 4px;"
+								id="mtc-help-icon-transfer-tasks">
+							<a href="javascript:void(0);">
+								<svg aria-hidden="true" class="slds-icon slds-icon--x-small slds-icon-text-default">
+									<use xlink:href="{!URLFOR($Resource.SalesforceLightningDesignSystem_v202, '/assets/icons/utility-sprite/svg/symbols.svg#info')}"></use>
+								</svg>
+								<span class="slds-assistive-text">Help</span>
+							</a>
+						</div>
+						<span class="slds-form-element__label m-bottom--"> Transfer Tasks/Events/Notes</span>
+						<apex:inputCheckBox Value="{!optTxfrTasksNotesOwned}"
+							styleClass="mtc-transfer-option"
+							html-aria-describedby="mtc-transfer-tasks-help" />
+						<span class="slds-checkbox--faux" data-check-on="Yes" data-check-off="No"></span>
+					</label>
+				</div>
+				<div id="mtc-transfer-tasks-help" class="mtc-slds-inline-help-popup slds-popover slds-popover--tooltip slds-nubbin--bottom-left"
+						role="tooltip" aria-live="polite" >
+					<div class="slds-popover__body slds-text-longform">
+						<p>Transfer Open Tasks, Events, Notes and Attachments owned by the current owner to the new owner</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Transfer Selected button -->
+			<div class="slds-col--padded slds-text-align--right">
+				<apex:commandButton title="Transfer Selected Contacts"
+					value=" Transfer Selected " rerender="msgs,mtc-search-results"
+					action="{!doTransfer}"
+					onClick="force2b.startContactTransfer();"
+					onComplete="force2b.finishedWithTransfer();"
+					styleClass="mtc-transfer-button slds-button slds-button--brand slds-button--neutral slds-not-selected"/>
+			</div>
+		</div>
+	</div>
+
+	<h3 class="slds-section-title--divider" id="mtc-search-results-header" style="display:none;">Search Results</h3>
+
+	<!-- Search Results Table -->
+	<apex:outputPanel id="mtc-search-results">
+	<apex:outputPanel layout="none" rendered="{!searchResults != null}">
+		<table class="slds-table slds-table--bordered slds-table--cell-buffer">
+			<thead>
+				<tr class="slds-text-heading--label">
+					<th scope="col">
+							<input type="checkbox" id="select-all-rows" checked="true"
+								onclick="force2b.toggleSelectAll(this.checked);" />
+					</th>
+					<apex:repeat value="{! $ObjectType.Contact.FieldSets.MassTransferContacts_Results_List_Column}" var="f">
+						<th scope="col" title="{!f.Label}">
+							<div class="slds-truncate">{!f.Label}</div>
+						</th>
+					</apex:repeat>
+				</tr>
+			</thead>
+			<tbody>
+				<apex:repeat value="{!searchResults}" var="c">
+					<tr scope="row">
+						<td>
+							<apex:inputCheckbox value="{!c.selected}" id="isSelected" styleClass="mtc-row-select-checkbox" />
+						</td>
+						<apex:repeat value="{! $ObjectType.Contact.FieldSets.MassTransferContacts_Results_List_Column}" var="f">
+							<td data-label="{!f.Label}" title="{!c.contact[f]}" >
+								<div class="slds-truncate">
+									<apex:outputField value="{!c.contact[f]}" rendered="{! f != 'Name'}" />
+									<apex:outputPanel rendered="{! f == 'Name'}" >
+										<a href="/{!c.contact.id}" target="_blank"><apex:outputField value="{!c.contact[f]}"/></a>
+									</apex:outputPanel>
+								</div>
+							</td>
+						</apex:repeat>
+					</tr>
+				</apex:repeat>
+			</tbody>
+		</table>
+	</apex:outputPanel>
+	</apex:outputPanel>
+
+	</apex:form>
+
+</div>
+</div>
+
+<script>
+j$(document).ready(function(){
+	force2b.onPageLoad();
+});
+</script>
+
+</html>
+</apex:page>
