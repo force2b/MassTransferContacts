@@ -297,9 +297,11 @@ j$ = jQuery.noConflict();
 								onclick="force2b.toggleSelectAll(this.checked);" />
 					</th>
 					<apex:repeat value="{! $ObjectType.Contact.FieldSets.MassTransferContacts_Results_List_Column}" var="f">
-						<th scope="col" title="{!f.Label}">
-							<div class="slds-truncate">{!f.Label}</div>
-						</th>
+						<apex:outputPanel layout="none" rendered="{! fieldVisibilityMap[f] == True}">
+							<th scope="col" title="{!f.Label}">
+								<div class="slds-truncate">{!f.Label}</div>
+							</th>
+						</apex:outputPanel>
 					</apex:repeat>
 				</tr>
 			</thead>
@@ -310,14 +312,16 @@ j$ = jQuery.noConflict();
 							<apex:inputCheckbox value="{!c.selected}" id="isSelected" styleClass="mtc-row-select-checkbox" />
 						</td>
 						<apex:repeat value="{! $ObjectType.Contact.FieldSets.MassTransferContacts_Results_List_Column}" var="f">
-							<td data-label="{!f.Label}" title="{!c.contact[f]}" >
-								<div class="slds-truncate">
-									<apex:outputField value="{!c.contact[f]}" rendered="{! f != 'Name'}" />
-									<apex:outputPanel rendered="{! f == 'Name'}" >
-										<a href="/{!c.contact.id}" target="_blank"><apex:outputField value="{!c.contact[f]}"/></a>
-									</apex:outputPanel>
-								</div>
-							</td>
+							<apex:outputPanel layout="none" rendered="{! fieldVisibilityMap[f] == True}">
+								<td data-label="{!f.Label}" title="{!c.contact[f]}" >
+									<div class="slds-truncate">
+										<apex:outputField value="{!c.contact[f]}" rendered="{! f != 'Name'}" />
+										<apex:outputPanel rendered="{! f == 'Name'}" >
+											<a href="/{!c.contact.id}" target="_blank"><apex:outputField value="{!c.contact[f]}"/></a>
+										</apex:outputPanel>
+									</div>
+								</td>
+							</apex:outputPanel>
 						</apex:repeat>
 					</tr>
 				</apex:repeat>

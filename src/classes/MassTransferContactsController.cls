@@ -19,8 +19,14 @@ public with sharing class MassTransferContactsController {
 	public Boolean optSendeMailToOwner 		{ get; set; }
 	public Boolean optTxfrTasksNotesOwned { get; set; }
 
-	// If this is set to TRUE (by an InputHidden tag on the page) then show SOQL and other debug messages
-	public Boolean debugMode = false;
+	// 1=Standard Debug Mode (display page messages with state)
+	// 2=Troubleshooting Debug Mode (displays the SOQL, but doesn't run the query)
+	private Integer debugMode = 0;
+
+	// Because VF doesn't really support using isAccessible() on field set members
+	// when the field is in a parent object, moving this into a map by Field Name
+	// that can be referenced by the VF page
+	public Map<String, Boolean> fieldVisibilityMap { get; set; }
 
 	// Collection of search results for displaying
 	// List<contact> searchResults = new List<contact>();
@@ -44,7 +50,12 @@ public with sharing class MassTransferContactsController {
 	// Constructor Method
 	// ------------------------------------------------
 	public MassTransferContactsController() {
-		this.debugMode = (apexPages.currentPage().getParameters().get('debug') == '1');
+		String dmode = apexPages.currentPage().getParameters().get('debug');
+		if (dmode == null) {
+			this.debugMode = 0;
+		} else {
+			this.debugMode = Integer.valueOf(dmode);
+		}
 
 		// Build a cached list of Contact/Account fields for the criteria picklist
 		buildSearchFieldsList();
@@ -142,10 +153,18 @@ public with sharing class MassTransferContactsController {
 
 		Schema.FieldSet listFields = SObjectType.Contact.FieldSets.MassTransferContacts_Results_List_Column;
 		Schema.DescribeFieldResult fieldResult;
+		this.fieldVisibilityMap = new Map<String, Boolean>();
 		for (Schema.FieldSetMember f : listFields.getFields()) {
+			if (this.debugMode == 2) {
+				ApexPages.AddMessage(new ApexPages.Message(ApexPages.Severity.INFO, 'Field: ' + f.getFieldPath(), ''));
+			}
 			if (f.getFieldPath().contains('.')) {
 				String fldName = f.getFieldPath().split('\\.')[1].toLowerCase();
 				String objName = f.getFieldPath().split('\\.')[0];
+				if (this.debugMode == 2) {
+					ApexPages.AddMessage(new ApexPages.Message(ApexPages.Severity.INFO,
+						' -- Object: ' + objName, ' -- Field: ' + fldName));
+				}
 				if (objName == 'Account') {
 					fieldResult = accountFieldMap.get(fldName).getDescribe();
 				} else if (objName == 'User') {
@@ -154,6 +173,7 @@ public with sharing class MassTransferContactsController {
 			} else {
 				fieldResult = contactFieldsMap.get(f.getFieldPath().toLowerCase()).getDescribe();
 			}
+			this.fieldVisibilityMap.put(f.getFieldPath(), fieldResult.isAccessible());
 			if (f.getFieldPath() != 'Id' && fieldResult.isAccessible()) {
 				soql += f.getFieldPath() + ',';
 			}
@@ -169,7 +189,7 @@ public with sharing class MassTransferContactsController {
 
 		// For each criteria line item, call the method to build the where clause component
 		for (SearchCriteria cl : this.criteriaLines) {
-			soql += cl.buildWhereClause(this.debugMode);
+			soql += cl.buildWhereClause(this.debugMode > 0);
 		}
 		if (soql.endsWith(' WHERE ')) {
 			soql = soql.removeEnd(' WHERE ');
@@ -180,9 +200,13 @@ public with sharing class MassTransferContactsController {
 		soql += ' ORDER BY Account.Name, Name LIMIT 800' ;
 
 		// Debug: Display the SOQL Query string
-		if (this.debugMode) {
+		if (this.debugMode > 0) {
 			ApexPages.AddMessage(new ApexPages.Message(ApexPages.Severity.INFO,
 				'SOQL', soql));
+			if (this.debugMode == 2) {
+				// in this case, only display the SOQL but don't run the query
+				return null;
+			}
 		}
 
 		// Run the database query and place results into the TransferContactSearchResult class
@@ -239,7 +263,7 @@ public with sharing class MassTransferContactsController {
 				contactIdsToTransfer.add(c.contactID) ;
 			}
 		}
-		if (this.debugMode) {
+		if (this.debugMode > 0) {
 			ApexPages.AddMessage(new ApexPages.Message(
 				ApexPages.Severity.INFO, 'Selected Count: ' + contactIdsToTransfer.size(), ''));
 		}
@@ -303,7 +327,7 @@ public with sharing class MassTransferContactsController {
 				OwnerId = toUserId
 			));
 		}
-		if (this.debugMode) {
+		if (this.debugMode > 0) {
 			ApexPages.AddMessage(new ApexPages.Message(
 				ApexPages.Severity.INFO, 'Query Size: ' + contacts.size(), ''));
 		}
