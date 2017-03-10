@@ -4,7 +4,9 @@
 * http://www.force2b.net
 *
 * Modifications:
-*
+* - 2017-03-06: Needed to escape the single apostrophe in a User's full name
+*	  however Salesforce passed this back to JS as "&#39;" so had to convert that
+*	  to "\\'"
 ********************************************************************* */
 /* top-level name-space */
 var force2b = force2b || {};
@@ -134,9 +136,9 @@ force2b.userSearchTypeAhead = function(inputField$) {
 							resultsListHtml += "<li>" +
 								"<a class=\"slds-lookup__item-action slds-media slds-media--center\" href=\"javascript:void(0);\" role=\"option\"" +
 										"onClick=\"force2b." + onSelectFunction + "('" + userRecord.Id +"', '" +
-											userRecord.Name + "', '" + rowNumber + "');\">" +
+											userRecord.Name.replace("&#39;", "\\'") + "', '" + rowNumber + "');\">" +
 									"<div class=\"slds-media__body\">" +
-										"<div class=\"slds-lookup__result-text\"><b>" + userRecord.Name +
+										"<div class=\"slds-lookup__result-text\"><b>" + userRecord.Name  +
 										"</b></div>" +
 										"<span class=\"slds-lookup__result-meta slds-text-body--small\">" +
 											userRecord.Username + " (" + userRecord.UserType +")" +
