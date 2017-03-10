@@ -272,6 +272,43 @@ j$ = jQuery.noConflict();
 				</div>
 			</div>
 
+			<!-- 10/20/2016: Add a new option for batch size -->
+			<div class="slds-col--padded">
+			<div class="slds-form-element__control">
+				<label class="slds-grid slds-grid--vertical-align-center">
+					<div class="slds-form-element__icon" style="margin-top: -5px; padding-right: 4px;"
+							id="mtc-help-icon-batch-size">
+						<a href="javascript:void(0);">
+							<svg aria-hidden="true" class="slds-icon slds-icon--x-small slds-icon-text-default">
+								<use xlink:href="{!URLFOR($Resource.SalesforceLightningDesignSystem_v202, '/assets/icons/utility-sprite/svg/symbols.svg#info')}"></use>
+							</svg>
+							<span class="slds-assistive-text">Help</span>
+						</a>
+					</div>
+					<span class="slds-form-element__label m-bottom--">Max Records</span>
+					<div class="slds-select_container" style="width:70px;" >
+						<apex:selectList value="{!batchSize}" size="1" id="mtc-batch-size"
+									styleClass="slds-select mtc-batch-size"  >
+							<apex:selectOption itemLabel="800" itemValue="800" />
+							<apex:selectOption itemLabel="600" itemValue="600" />
+							<apex:selectOption itemLabel="400" itemValue="400" />
+							<apex:selectOption itemLabel="200" itemValue="200" />
+							<apex:selectOption itemLabel="100" itemValue="100" />
+							<apex:selectOption itemLabel="50" itemValue="50" />
+							<apex:selectOption itemLabel="25" itemValue="25" />
+							<apex:selectOption itemLabel="10" itemValue="10" />
+						</apex:selectList>
+					</div>
+				</label>
+				<div id="mtc-batch-size-help" class="mtc-slds-inline-help-popup slds-popover slds-popover--tooltip slds-nubbin--bottom-left"
+						role="tooltip" aria-live="polite" >
+					<div class="slds-popover__body slds-text-longform">
+						<p>Max number of records to query and transfer at once</p>
+					</div>
+				</div>
+			</div>
+			</div>
+
 			<!-- Transfer Selected button -->
 			<div class="slds-col--padded slds-text-align--right">
 				<apex:commandButton title="Transfer Selected Contacts"

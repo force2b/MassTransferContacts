@@ -40,6 +40,15 @@ force2b.onPageLoad = function() {
 		},
 		function() { 	j$( "#mtc-send-email-help" ).hide(); }
 	);
+
+	j$( "#mtc-help-icon-batch-size" ).hover(
+		function() {
+			var helpPopupsTop = j$("#mtc-help-icon-batch-size").offset().top-200;
+			j$("#mtc-batch-size-help").css("margin-top", helpPopupsTop + "px").show();
+		},
+		function() { 	j$( "#mtc-batch-size-help" ).hide(); }
+	);
+
 };
 
 /*
