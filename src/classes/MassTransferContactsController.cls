@@ -11,7 +11,8 @@
 *
 * @modifications:
 * - 09/27/2016: Exclude GroupEventType='Proposed Event' because they cannot be transferred
-*
+* - 10/20/2016: Add logic to allow the user to change the result size to help address
+*		CPU timeout errors.
 */
 public with sharing class MassTransferContactsController {
 
@@ -24,6 +25,9 @@ public with sharing class MassTransferContactsController {
 	// 1=Standard Debug Mode (display page messages with state)
 	// 2=Troubleshooting Debug Mode (displays the SOQL, but doesn't run the query)
 	private Integer debugMode = 0;
+
+	// Default the batch size to 800, but allow the user to reduce
+	public Integer batchsize 	{ get; set; }
 
 	// Because VF doesn't really support using isAccessible() on field set members
 	// when the field is in a parent object, moving this into a map by Field Name
@@ -70,6 +74,18 @@ public with sharing class MassTransferContactsController {
 					c.logical = 'AND';
 				}
 				this.criteriaLines.add(c);
+		}
+
+		// Default batch size
+		this.batchSize = 800;
+
+		// Look for packages that normally create issues with ownership changes
+		// and reduce the batch size.
+		// NPPS, Pardot (pi)
+		Set<String> packagesToLookFor = new Set<String>{ 'npsp', 'pi' };
+		if ([SELECT Count() FROM PackageLicense
+				WHERE NamespacePrefix IN :packagesToLookFor] > 0) {
+			this.batchSize = 200;
 		}
 	}
 
@@ -199,7 +215,7 @@ public with sharing class MassTransferContactsController {
 		soql = soql.replace('WHERE  AND', 'WHERE ');
 
 		// Sort the results and limit to the first 800 rows
-		soql += ' ORDER BY Account.Name, Name LIMIT 800' ;
+		soql += ' ORDER BY Account.Name, Name LIMIT ' + batchsize ;
 
 		// Debug: Display the SOQL Query string
 		if (this.debugMode > 0) {
