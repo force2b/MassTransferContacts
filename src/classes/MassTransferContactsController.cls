@@ -10,6 +10,8 @@
 * @unit-test: MassTransferContactsController_Test
 *
 * @modifications:
+* - 09/27/2016: Exclude GroupEventType='Proposed Event' because they cannot be transferred
+*
 */
 public with sharing class MassTransferContactsController {
 
@@ -290,11 +292,12 @@ public with sharing class MassTransferContactsController {
 				// Query the Contacts and their related Notes, Attachments, and Tasks to be transferred
 				// MGS, 06/22/2010: Limit the Sub-Queries to 1000 records because SalesForce
 				//    seems to have an issue with more than that
+				// MGS, 09/27/2016: 'Proposed Event' type Events cannot be transferred
 				for (Contact c : [SELECT Id, OwnerId,
 							(SELECT Id, OwnerId FROM Notes),
 							(SELECT Id, OwnerId FROM Attachments),
 							(SELECT Id, OwnerId FROM Tasks WHERE isClosed = False),
-							(SELECT Id, OwnerId FROM Events )
+							(SELECT Id, OwnerId FROM Events WHERE GroupEventType != 'Proposed Event')
 						FROM Contact WHERE Id IN :contactIdsToTransfer]) {
 
 					txfrAttachments.addAll(changeChildRecordOwners(c.Attachments, c.OwnerId, toUserId));
