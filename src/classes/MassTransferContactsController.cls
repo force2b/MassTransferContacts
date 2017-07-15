@@ -49,7 +49,7 @@ public with sharing class MassTransferContactsController {
 
 	// Returns true if there are Community/Portal Users in the Org
 	public Boolean gethasCommunityUsers() {
-		return [SELECT Count() FROM User WHERE IsActive = True AND ContactId != null] > 0;
+		return [SELECT Count() FROM User WHERE IsActive = True AND ContactId != null LIMIT 1] > 0;
 	}
 
 	// ------------------------------------------------
@@ -84,7 +84,7 @@ public with sharing class MassTransferContactsController {
 		// NPPS, Pardot (pi)
 		Set<String> packagesToLookFor = new Set<String>{ 'npsp', 'pi' };
 		if ([SELECT Count() FROM PackageLicense
-				WHERE NamespacePrefix IN :packagesToLookFor] > 0) {
+				WHERE NamespacePrefix IN :packagesToLookFor LIMIT 1] > 0) {
 			this.batchSize = 200;
 		}
 	}
@@ -437,7 +437,7 @@ public with sharing class MassTransferContactsController {
 		htmlBody += '</Table>';
 
 		// Get the target user eMail address
-		User user = [SELECT ID, eMail FROM User Where ID = :toUserID Limit 1];
+		User user = [SELECT ID, eMail FROM User Where ID = :toUserID LIMIT 1];
 
 		// Create the eMail object
 		Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
